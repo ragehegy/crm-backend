@@ -7,11 +7,13 @@ from django.conf import settings
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin
 )
+from django.utils import timezone
 from django.db import models
+
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, username, email, password=None):
+    def create_user(self, username, email, password='123'):
         """Create and return a `User` with an email, username and password."""
         if username is None:
             raise TypeError('Users must have a username.')
@@ -41,10 +43,14 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+    first_name = models.CharField(blank=False, max_length=255)
+    last_name = models.CharField(blank=False, max_length=255)
     username = models.CharField(db_index=True, max_length=255, unique=True)
-    email = models.EmailField(db_index=True, unique=True)
+    email = models.EmailField(db_index=True, unique=True)    
+    phone = models.CharField(max_length=255, blank=False)
     is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    is_staff = models.BooleanField(default=True)
+    created_at = models.DateTimeField(editable=False, default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = 'email'
@@ -58,7 +64,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         This string is used when a `User` is printed in the console.
         """
-        return self.email
+        return "{} {} - ({})".format(self.first_name, self.last_name, self.email)
 
     @property
     def tokens(self):

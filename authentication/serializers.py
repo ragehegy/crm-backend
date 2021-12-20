@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate
 
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 from .models import User
@@ -35,9 +36,9 @@ class UserSerializer(serializers.Serializer):
         
 
 class LoginSerializer(serializers.Serializer):
-    email = serializers.CharField(max_length=255)
+    email = serializers.CharField(max_length=255, required=True)
     username = serializers.CharField(max_length=255, read_only=True)
-    password = serializers.CharField(max_length=128, write_only=True)
+    password = serializers.CharField(max_length=128, write_only=True, required=True)
     tokens = serializers.JSONField(read_only=True)
 
     def get_tokens(self, obj):
@@ -52,25 +53,15 @@ class LoginSerializer(serializers.Serializer):
         email = data.get('email', None)
         password = data.get('password', None)
 
-        if email is None:
-            raise serializers.ValidationError(
-                'An email address is required to log in.'
-            )
-
-        if password is None:
-            raise serializers.ValidationError(
-                'A password is required to log in.'
-            )
-
         user = authenticate(username=email, password=password)
 
         if user is None:
-            raise serializers.ValidationError(
+            raise AuthenticationFailed(
                 'A user with this email and password was not found.'
             )
 
         if not user.is_active:
-            raise serializers.ValidationError(
+            raise AuthenticationFailed(
                 'This user has been deactivated.'
             )
 

@@ -9,8 +9,6 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -24,7 +22,9 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'crm',
     'authentication',
-    'corsheaders'
+    'business',
+
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -38,6 +38,8 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'backend.urls'
 
