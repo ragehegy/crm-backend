@@ -1,33 +1,46 @@
+from typing import Any
 from django.contrib import admin
 
+from .forms import DistrictEmployeesForm
 from .models import *
+from .serializers import DistrictEmployeesSerializer
+
 
 @admin.register(Business)
-class Business(admin.ModelAdmin):
+class BusinessAdmin(admin.ModelAdmin):
     pass
 
 
 @admin.register(Unit)
-class Unit(admin.ModelAdmin):
-    exclude = ('id', 'business',)
+class UnitAdmin(admin.ModelAdmin):
+    # exclude = ('id', 'business',)
+    pass
     
 
-
 @admin.register(Employee)
-class Employee(admin.ModelAdmin):
-    exclude = ('id', 'business', 'password', 'last_login', 'is_staff')
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'last_name', 'email', 'type', 'phone', 'is_active', 'last_login')
+    # exclude = ('id', 'business', 'password', 'last_login', 'is_staff')
 
 
 @admin.register(UnitHead)
-class UnitHead(admin.ModelAdmin):
+class UnitHeadAdmin(admin.ModelAdmin):
     pass
 
 
 @admin.register(BusinessDistrict)
-class BusinessDistrict(admin.ModelAdmin):
+class BusinessDistrictAdmin(admin.ModelAdmin):
     exclude = ('id', 'business',)
 
 
 @admin.register(DistrictEmplyoee)
-class DistrictEmplyoee(admin.ModelAdmin):
-    pass
+class DistrictEmplyoeeAdminAdmin(admin.ModelAdmin):
+    form = DistrictEmployeesForm
+    list_display = ('district', 'employee',)
+    exclude = ('employee', )
+
+    def save_model(self, request: Any, obj, form: Any, change: Any) -> None:
+        serializer = DistrictEmployeesSerializer(data=form.data)
+        serializer.is_valid()
+
+        return serializer.save()

@@ -1,4 +1,3 @@
-from datetime import datetime
 from uuid import uuid4
 
 from django.db import models
@@ -23,6 +22,14 @@ class Business(models.Model):
 
 
 class Employee(User):
+    EMPLOYEE_LEVELS = (
+        ("UNIT_HEAD", "UNIT_HEAD"),
+        ("DISTRICT_MANAGER", "DISTRICT_MANAGER"),
+        ("MEDICAL_REP", "MEDICAL_REP"),
+    )
+
+    type = models.CharField(max_length=255, choices=EMPLOYEE_LEVELS)
+
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name="employees")
     
     def __str__(self) -> str:
@@ -101,5 +108,8 @@ class BusinessDistrict(models.Model):
 class DistrictEmplyoee(models.Model):
     created = models.DateTimeField(editable=False, default=timezone.now)
 
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="reps")
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="district")
     district = models.ForeignKey(BusinessDistrict, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return self.district.name + " " + self.employee.name

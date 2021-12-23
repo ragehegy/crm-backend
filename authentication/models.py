@@ -103,3 +103,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         }, settings.SECRET_KEY, algorithm='HS256')
 
         return token
+
+    
+    @property
+    def name(self):
+        return self.first_name.title() + " " + self.last_name.title()

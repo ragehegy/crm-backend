@@ -36,6 +36,7 @@ class UserSerializer(serializers.Serializer):
         
 
 class LoginSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=255, required=False)
     email = serializers.CharField(max_length=255, required=True)
     username = serializers.CharField(max_length=255, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True, required=True)
@@ -66,9 +67,10 @@ class LoginSerializer(serializers.Serializer):
             )
 
         return {
-            'email': user.email,
+            'name': user.name,
             'username': user.username,
-            'tokens': user.tokens
+            'email': user.email,
+            'tokens': user.tokens,
         }
     
 
