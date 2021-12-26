@@ -109,3 +109,8 @@ static_collected
 
 # Exclude machine-specific vs code settings
 .vscode/settings.json
+
+# migrations
+migrations/*
+_migrations/*
+!_migrations/__init__.py

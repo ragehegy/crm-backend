@@ -23,6 +23,9 @@ INSTALLED_APPS = [
     'crm',
     'authentication',
     'business',
+    'plan',
+    'shared',
+    'inventory',
 
     'corsheaders',
 ]

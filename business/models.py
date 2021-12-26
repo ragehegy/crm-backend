@@ -72,40 +72,20 @@ class TeamMember(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="team")
 
 
-
-class Governorate(models.Model):
-    id = models.AutoField(primary_key=True)
-    en_name = models.CharField(blank=False, unique=True, max_length=255)
-    ar_name = models.CharField(blank=False, unique=True, max_length=255)
-
-    def __str__(self) -> str:
-        return self.en_name.title()
-
-
-class City(models.Model):
-    id = models.AutoField(primary_key=True)
-    en_name = models.CharField(blank=False, max_length=255)
-    ar_name = models.CharField(blank=False, max_length=255)
-
-    governorate = models.ForeignKey(Governorate, on_delete=models.CASCADE, related_name="cities")
-
-    def __str__(self) -> str:
-        return self.en_name.title()
-
-
 class BusinessDistrict(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
     name = models.CharField(blank=False, max_length=255)
     created = models.DateTimeField(editable=False, default=timezone.now)
     
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name="districts")
-    city = models.ForeignKey(City, on_delete=models.CASCADE)
+    city = models.ForeignKey('shared.City', on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return self.name.title()
 
 
 class DistrictEmplyoee(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
     created = models.DateTimeField(editable=False, default=timezone.now)
 
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="district")
@@ -113,3 +93,40 @@ class DistrictEmplyoee(models.Model):
 
     def __str__(self) -> str:
         return self.district.name + " " + self.employee.name
+
+
+class BusinessClient(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+    created = models.DateTimeField(editable=False, default=timezone.now)
+    
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='clients')
+    client = models.ForeignKey('shared.Client', on_delete=models.CASCADE, related_name='businesses')
+
+
+class DistrictEmployeeLine(models.Model):    
+    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+    
+    employee = models.ForeignKey(DistrictEmplyoee, on_delete=models.CASCADE, related_name='lines')
+    line = models.ForeignKey('inventory.Line', on_delete=models.CASCADE, related_name='districts')
+    
+
+class Request(models.Model):
+    STATUS = (
+        ("NEW", "NEW"),
+        ("SEEN", "SEEN"),
+        ("APPROVED", "APPROVED"),
+        ("REJECTED", "REJECTED"),
+    )
+
+    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+    status = models.CharField(max_length=255, blank=False, default='UPCOMING', choices=STATUS)
+    created = models.DateTimeField(editable=False, default=timezone.now)
+
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='requests')
+
+
+class LeaveRequest(models.Model):
+    id = models.OneToOneField(Request, primary_key=True, on_delete=models.CASCADE)
+    start_date = models.DateField(blank=False)
+    end_date = models.DateField(blank=False)
+    reason = models.CharField(max_length=255, blank=False)
