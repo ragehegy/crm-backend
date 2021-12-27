@@ -6,7 +6,7 @@ from django.utils import timezone
 from authentication.models import User
 
 class Business(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
     name = models.CharField("Business name", blank=False, unique=True, max_length=255)
     domain = models.CharField("Company preferred domain", blank=False, unique=True, max_length=255)
     address = models.CharField(blank=False, max_length=255)
@@ -37,7 +37,7 @@ class Employee(User):
 
 
 class Unit(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
     name = models.CharField("Unit name", blank=False, unique=True, max_length=255)
     created = models.DateTimeField(editable=False, default=timezone.now)
 
@@ -53,7 +53,7 @@ class UnitHead(models.Model):
 
 
 class SalesTeam(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
     title = models.CharField(blank=False, unique=True, max_length=255)
     created = models.DateTimeField(editable=False, default=timezone.now)
 
@@ -64,7 +64,7 @@ class SalesTeam(models.Model):
 
 
 class TeamMember(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
     is_manager = models.BooleanField(default=False)
     created = models.DateTimeField(editable=False, default=timezone.now)
 
@@ -73,7 +73,7 @@ class TeamMember(models.Model):
 
 
 class BusinessDistrict(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
     name = models.CharField(blank=False, max_length=255)
     created = models.DateTimeField(editable=False, default=timezone.now)
     
@@ -85,7 +85,7 @@ class BusinessDistrict(models.Model):
 
 
 class DistrictEmplyoee(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
     created = models.DateTimeField(editable=False, default=timezone.now)
 
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="district")
@@ -96,7 +96,7 @@ class DistrictEmplyoee(models.Model):
 
 
 class BusinessClient(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
     created = models.DateTimeField(editable=False, default=timezone.now)
     
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='clients')
@@ -104,29 +104,49 @@ class BusinessClient(models.Model):
 
 
 class DistrictEmployeeLine(models.Model):    
-    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
     
     employee = models.ForeignKey(DistrictEmplyoee, on_delete=models.CASCADE, related_name='lines')
     line = models.ForeignKey('inventory.Line', on_delete=models.CASCADE, related_name='districts')
     
 
 class Request(models.Model):
-    STATUS = (
+    REQUEST_STATUS = (
         ("NEW", "NEW"),
         ("SEEN", "SEEN"),
         ("APPROVED", "APPROVED"),
         ("REJECTED", "REJECTED"),
     )
 
-    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
-    status = models.CharField(max_length=255, blank=False, default='UPCOMING', choices=STATUS)
+    REQUEST_TYPES = (
+        ("LEAVE", "LEAVE"),
+        ("COACHED_VISIT", "COACHED_VISIT"),
+        ("PLAN", "PLAN"),
+    )
+
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
+    type = models.CharField(max_length=255, blank=False, default='LEAVE', choices=REQUEST_TYPES)
+    status = models.CharField(max_length=255, blank=False, default='UPCOMING', choices=REQUEST_STATUS)
     created = models.DateTimeField(editable=False, default=timezone.now)
 
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='requests')
 
 
 class LeaveRequest(models.Model):
-    id = models.OneToOneField(Request, primary_key=True, on_delete=models.CASCADE)
+    LEAVE_TYPES = (
+        ("SICK", "SICK"),
+        ("CASUAL", "CASUAL"),
+        ("VACATION", "VACATION"),
+        ("NATIONAL_HOLIDAY", "NATIONAL_HOLIDAY"),
+    )
+
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
     start_date = models.DateField(blank=False)
     end_date = models.DateField(blank=False)
+    leave_type = models.CharField(max_length=255, default="CASUAL", choices=LEAVE_TYPES)
     reason = models.CharField(max_length=255, blank=False)
+    
+    request = models.OneToOneField(Request, on_delete=models.CASCADE, related_name='leave')
+
+    def __str__(self) -> str:
+        return "%s - %s Leave ( %s to %s )" %(self.employee.name, self.type, self.start_date, self.end_date)

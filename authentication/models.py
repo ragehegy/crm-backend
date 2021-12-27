@@ -42,7 +42,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
     first_name = models.CharField(blank=False, max_length=255)
     last_name = models.CharField(blank=False, max_length=255)
     username = models.CharField(db_index=True, max_length=255, unique=True)

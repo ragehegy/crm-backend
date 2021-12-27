@@ -7,6 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from .models import User
 
 class UserSerializer(serializers.Serializer):
+    id = serializers.UUIDField(required=False)
     username = serializers.CharField()
     email = serializers.CharField()
     password = serializers.CharField(write_only=True)
@@ -14,7 +15,7 @@ class UserSerializer(serializers.Serializer):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'token']
+        fields = ['id', 'username', 'email', 'password', 'token']
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
@@ -36,9 +37,12 @@ class UserSerializer(serializers.Serializer):
         
 
 class LoginSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=255, required=False)
+    id = serializers.UUIDField(required=False)
+    first_name = serializers.CharField(required=False)
+    last_name = serializers.CharField(required=False)
     email = serializers.CharField(max_length=255, required=True)
     username = serializers.CharField(max_length=255, read_only=True)
+    phone = serializers.CharField(max_length=255, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True, required=True)
     tokens = serializers.JSONField(read_only=True)
 
@@ -67,9 +71,12 @@ class LoginSerializer(serializers.Serializer):
             )
 
         return {
-            'name': user.name,
+            'id': user.id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
             'username': user.username,
             'email': user.email,
+            'phone': user.phone,
             'tokens': user.tokens,
         }
     

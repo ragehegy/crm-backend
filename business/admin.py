@@ -44,3 +44,8 @@ class DistrictEmplyoeeAdminAdmin(admin.ModelAdmin):
         serializer.is_valid()
 
         return serializer.save()
+
+
+@admin.register(LeaveRequest)
+class RequestAdmin(admin.ModelAdmin):
+    pass

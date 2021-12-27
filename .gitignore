@@ -114,3 +114,6 @@ static_collected
 migrations/*
 _migrations/*
 !_migrations/__init__.py
+
+# uploads
+uploads/*

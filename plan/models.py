@@ -21,7 +21,7 @@ VISIT_STATUS = (
 )
 
 class Plan(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
     name = models.CharField("Plan title", blank=False, unique=True, max_length=255)
     start_date = models.DateField(blank=False)
     end_date = models.DateField(blank=False)
@@ -44,7 +44,7 @@ class SubPlan(models.Model):
 
 
 class PlanRequest(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
 
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE, related_name='requests')
     request = models.ForeignKey('business.Request', on_delete=models.CASCADE, related_name='plan')
@@ -57,7 +57,7 @@ class VisitAgenda(models.Model):
         ("COACHED", "COACHED"),
     )
 
-    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
     status = models.CharField(max_length=255, blank=False, default='NEW', choices=PLAN_STATUS)
     type = models.CharField(max_length=255, blank=False, default='SINGLE', choices=VISIT_TYPES)
 
@@ -71,7 +71,7 @@ class DoubleVisit(models.Model):
         ("COACHED", "COACHED"),
     )
 
-    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
     type = models.CharField(max_length=255, blank=False, default='SINGLE', choices=VISIT_TYPES)
     
     visit = models.OneToOneField(VisitAgenda, on_delete=models.CASCADE, related_name='coach')
@@ -79,14 +79,14 @@ class DoubleVisit(models.Model):
 
 
 class VisitDetails(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
     status = models.CharField(max_length=255, blank=False, default='UPCOMING', choices=VISIT_STATUS)
     timestamp = models.DateTimeField(editable=False, default=timezone.now)
     notes = models.TextField(blank=True)
 
 
-class VisitProducts(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4(), unique=True)
+class VisitProduct(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
     feedback = models.CharField(max_length=255, blank=False, default=0)
     notes = models.TextField(blank=True)
     
