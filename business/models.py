@@ -20,6 +20,10 @@ class Business(models.Model):
     def __str__(self) -> str:
         return "%s - (%s)" %(self.name, self.domain)
 
+    class Meta:
+        ordering = ['name', 'domain']
+        verbose_name = 'Business'
+        verbose_name_plural = 'Businesses'
 
 class Employee(User):
     EMPLOYEE_LEVELS = (
@@ -79,6 +83,17 @@ class BusinessDistrict(models.Model):
     
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name="districts")
     city = models.ForeignKey('shared.City', on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return self.name.title()
+
+
+class DistrictBrick(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
+    name = models.CharField(blank=False, max_length=255)
+    created = models.DateTimeField(editable=False, default=timezone.now)
+    
+    district = models.ForeignKey(BusinessDistrict, on_delete=models.CASCADE, related_name="bricks")
 
     def __str__(self) -> str:
         return self.name.title()
@@ -149,4 +164,4 @@ class LeaveRequest(models.Model):
     request = models.OneToOneField(Request, on_delete=models.CASCADE, related_name='leave')
 
     def __str__(self) -> str:
-        return "%s - %s Leave ( %s to %s )" %(self.employee.name, self.type, self.start_date, self.end_date)
+        return "%s - %s Leave ( %s to %s )" %(self.request.employee.name, self.leave_type, self.start_date, self.end_date)

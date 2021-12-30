@@ -5,6 +5,16 @@ from .forms import DistrictEmployeesForm
 from .models import *
 from .serializers import DistrictEmployeesSerializer
 
+from shared.models import City
+
+
+class DistrictInline(admin.TabularInline):
+    model = BusinessDistrict
+
+
+class BrickInline(admin.TabularInline):
+    model = DistrictBrick
+
 
 @admin.register(Business)
 class BusinessAdmin(admin.ModelAdmin):
@@ -28,9 +38,16 @@ class UnitHeadAdmin(admin.ModelAdmin):
     pass
 
 
+@admin.register(City)
+class BusinessCityAdmin(admin.ModelAdmin):
+    inlines = [DistrictInline,]
+
+
 @admin.register(BusinessDistrict)
-class BusinessDistrictAdmin(admin.ModelAdmin):
-    exclude = ('id', 'business',)
+class CityBricksAdmin(admin.ModelAdmin):
+    # exclude = ('id', 'business',)
+    inlines = [BrickInline,]
+    # raw_id_fields = ("city",)
 
 
 @admin.register(DistrictEmplyoee)

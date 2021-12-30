@@ -11,6 +11,9 @@ class Governorate(models.Model):
     def __str__(self) -> str:
         return self.en_name.title()
 
+    class Meta:
+        ordering = ['en_name', 'ar_name']
+
 
 class City(models.Model):
     id = models.AutoField(primary_key=True)
@@ -22,6 +25,11 @@ class City(models.Model):
     def __str__(self) -> str:
         return self.en_name.title()
 
+    class Meta:
+        ordering = ['en_name', 'ar_name']
+        verbose_name = 'City'
+        verbose_name_plural = 'Cities'
+
 
 class Specialty(models.Model):
     id = models.AutoField(primary_key=True)
@@ -30,6 +38,11 @@ class Specialty(models.Model):
 
     def __str__(self) -> str:
         return self.en_name
+
+    class Meta:
+        ordering = ['en_name', 'ar_name']
+        verbose_name = 'Specialty'
+        verbose_name_plural = 'Specialties'
 
 
 class Client(models.Model):
@@ -42,6 +55,9 @@ class Client(models.Model):
     def __str__(self) -> str:
         return self.name.title()
 
+    class Meta:
+        ordering = ['name',]
+
 
 class ClientSpecialty(models.Model):
     id = models.AutoField(primary_key=True)
@@ -51,3 +67,7 @@ class ClientSpecialty(models.Model):
 
     def __str__(self) -> str:
         return "%s (%s)" %(self.client.name, self.specialty.name)
+
+    class Meta:
+        verbose_name = 'Client Specialty'
+        verbose_name_plural = 'Client Specialties'
