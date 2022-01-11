@@ -33,6 +33,7 @@ class Employee(User):
     )
 
     type = models.CharField(max_length=255, choices=EMPLOYEE_LEVELS)
+    leaves_balance = models.IntegerField(blank=False, default=21)
 
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name="employees")
     

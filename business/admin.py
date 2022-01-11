@@ -16,6 +16,10 @@ class BrickInline(admin.TabularInline):
     model = DistrictBrick
 
 
+@admin.register(BusinessClient)
+class BusinessClientAdmin(admin.ModelAdmin):
+    pass
+
 @admin.register(Business)
 class BusinessAdmin(admin.ModelAdmin):
     pass
