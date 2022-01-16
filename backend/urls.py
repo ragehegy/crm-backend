@@ -1,8 +1,13 @@
 from django.contrib import admin
 from django.urls import path, include
 
-from django.conf import settings
+from django.conf import settings, urls
 from django.conf.urls.static import static
+
+from inventory.admin import custom_admin
+
+admin.site = custom_admin
+admin.autodiscover()
 
 urlpatterns = [
     path('auth/', include('authentication.urls')),
