@@ -3,6 +3,8 @@ from django.contrib import admin
 from .models import Line, Product
 
 class CustomAdmin(admin.AdminSite):
+    login_template = 'admin/login.html'
+    
     def login(self, request, extra_context=None):
         print(request.GET)
         print(request.POST)
