@@ -1,7 +1,7 @@
 <html lang="en-us" dir="ltr">
 
 <head>
-  <title>Log in | Django site admin</title>
+  <title>Log in | Al Amin admin</title>
   <link rel="stylesheet" type="text/css" href="/static/admin/css/base.css">
   <link rel="stylesheet" type="text/css" href="/static/admin/css/nav_sidebar.css">
   <script src="/static/admin/js/nav_sidebar.js" defer=""></script>
@@ -26,9 +26,9 @@
         <!-- Content -->
         <div id="content" class="colM">
           <div id="content-main">
-            <form action="/admin/login/?next=/admin/" method="post" id="login-form"><input type="hidden"
-                name="csrfmiddlewaretoken" value="dEuIdFljB930QLOxPUl8JjBmFtuSpac0LyneBpEtaNmQHV9wDq1A3yAovshsGToo">
+            <form action="/admin/login/?next=/admin/" method="post" id="login-form">
               {% csrf_token %}
+              <input hidden name="business_id" value="cc594565-8a41-4229-8797-981010e5cf74">
               <div class="form-row">
                 <label class="required" for="id_username">Email:</label> <input type="text" name="username" autofocus=""
                   autocapitalize="none" autocomplete="username" maxlength="254" required="" id="id_username">

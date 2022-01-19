@@ -20,7 +20,6 @@ for line in content.splitlines():
 
     if match:
         k, v = match.group(1), match.group(2)
-        print(k, v)
 
         single = re.match(r"\A'(.*)'\Z", v)
 

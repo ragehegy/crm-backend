@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'shared',
     'inventory',
 
+    'django_extensions',
     'corsheaders',
 ]
 
@@ -146,6 +147,11 @@ class CorsMiddleware:
 
 MIDDLEWARE += [
     'backend.settings.CorsMiddleware'
+]
+
+AUTHENTICATION_BACKENDS = [
+    # 'django.contrib.auth.backends.ModelBackend',
+    'authentication.backends.EmployeeBackend',
 ]
 
 import django_heroku
