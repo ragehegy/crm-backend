@@ -90,6 +90,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.env
 
 # Spyder project settings
 .spyderproject
@@ -106,7 +107,7 @@ venv.bak/
 
 # Exclude collected Django static files
 static_collected
-staticfiles/*
+staticfiles/
 
 # Exclude machine-specific vs code settings
 .vscode/settings.json
@@ -125,5 +126,3 @@ uploads/*
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
-
-.env

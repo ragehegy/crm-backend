@@ -1,17 +1,17 @@
 from django.contrib import admin
-from adminsite.admin import custom_admin
+from adminsite.admin import custom_admin, CustomModelAdmin
 
 from .models import City, Client, Governorate
 
 class GovernCitiesTab(admin.TabularInline):
     model = City
 
-class BusinessCityAdmin(admin.ModelAdmin):
+class BusinessCityAdmin(CustomModelAdmin):
     # exclude = ('id', 'business',)
     inlines = [GovernCitiesTab,]
 
 
-class ClientAdmin(admin.ModelAdmin):
+class ClientAdmin(CustomModelAdmin):
     pass
 
 custom_admin.register(Client, ClientAdmin)
