@@ -1,10 +1,8 @@
-from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
-
 from django.contrib import admin
 from django.contrib.auth.models import AnonymousUser
 
-from business.models import Employee, Business
-from utils.resolve_host import get_tenant
+from business.models import Employee
+from utils.resolve_host import get_business
 
 class CustomAdmin(admin.AdminSite):
     login_template = 'admin/login.html'
@@ -20,7 +18,8 @@ class CustomAdmin(admin.AdminSite):
 custom_admin = CustomAdmin()
 
 class CustomModelAdmin(admin.ModelAdmin):
+    def get_business(self, request):
+        return get_business(request)
+
     def changelist_view(self, request, *args, **kwargs):
-        print("tenant: ", get_tenant(request))
-        print(Business.objects.filter(domain=get_tenant(request)))
         return super().changelist_view(request, *args, **kwargs)

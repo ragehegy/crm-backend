@@ -1,14 +1,20 @@
 from django.contrib import admin
 
-from .models import Line, Product
-
 from adminsite.admin import CustomModelAdmin, custom_admin, CustomAdmin
-from utils.resolve_host import get_tenant
+from business.models import Business
+from .models import Line, Product
 
 class LineAdmin(CustomModelAdmin):
 
+    def save_form(self, request, form, change):
+        r = super(LineAdmin, self).save_form(request, form, change)
+        if not change:
+            r.business_id = self.get_business(request).id
+        return r
+    
     def get_queryset(self, request):
-        print(get_tenant(request))
+        if self.get_business(request):
+            self.exclude = ('id', 'business',)
         return super().get_queryset(request)
 
 class ProductAdmin(CustomModelAdmin):
