@@ -146,8 +146,6 @@ MIDDLEWARE += [
     'backend.settings.CorsMiddleware'
 ]
 
-import django_heroku
-django_heroku.settings(locals())
 
 
 AUTH_USER_MODEL = 'authentication.User'
