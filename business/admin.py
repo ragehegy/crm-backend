@@ -1,7 +1,7 @@
 from typing import Any
 from django.contrib import admin
 
-from .forms import DistrictEmployeesForm
+#from .forms import DistrictEmployeesForm
 from .models import *
 from .serializers import DistrictEmployeesSerializer
 
@@ -54,17 +54,17 @@ class CityBricksAdmin(admin.ModelAdmin):
     # raw_id_fields = ("city",)
 
 
-@admin.register(DistrictEmplyoee)
-class DistrictEmplyoeeAdminAdmin(admin.ModelAdmin):
-    form = DistrictEmployeesForm
-    list_display = ('district', 'employee',)
-    exclude = ('employee', )
+#@admin.register(DistrictEmplyoee)
+#class DistrictEmplyoeeAdminAdmin(admin.ModelAdmin):
+ #   form = DistrictEmployeesForm
+ #   list_display = ('district', 'employee',)
+ #   exclude = ('employee', )
 
-    def save_model(self, request: Any, obj, form: Any, change: Any) -> None:
-        serializer = DistrictEmployeesSerializer(data=form.data)
-        serializer.is_valid()
+ #   def save_model(self, request: Any, obj, form: Any, change: Any) -> None:
+ #       serializer = DistrictEmployeesSerializer(data=form.data)
+ #       serializer.is_valid()
 
-        return serializer.save()
+ #YY       return serializer.save()
 
 
 @admin.register(LeaveRequest)
