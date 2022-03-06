@@ -18,8 +18,19 @@ class CustomAdmin(admin.AdminSite):
 custom_admin = CustomAdmin()
 
 class CustomModelAdmin(admin.ModelAdmin):
+    def save_form(self, request, form, change):
+        r = super().save_form(request, form, change)
+        if not change:
+            r.business_id = self.get_business(request).id
+        return r
+
     def get_business(self, request):
         return get_business(request)
 
     def changelist_view(self, request, *args, **kwargs):
         return super().changelist_view(request, *args, **kwargs)
+
+    def get_queryset(self, request):
+        if self.get_business(request):
+            self.exclude = ('id', 'business',)
+        return super().get_queryset(request)
