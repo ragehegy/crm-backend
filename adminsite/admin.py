@@ -1,8 +1,10 @@
+from django.apps import apps
 from django.contrib import admin
 from django.contrib.auth.models import AnonymousUser
 
 from business.models import Employee
 from utils.resolve_host import get_business
+from utils.constants import APPS
 
 class CustomAdmin(admin.AdminSite):
     login_template = 'admin/login.html'
@@ -34,3 +36,10 @@ class CustomModelAdmin(admin.ModelAdmin):
         if self.get_business(request):
             self.exclude = ('id', 'business',)
         return super().get_queryset(request)
+
+for model in apps.get_models():
+    try:
+        if model._meta.app_label in APPS:
+            custom_admin.register(model)
+    except Exception:
+        continue
