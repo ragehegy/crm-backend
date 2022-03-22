@@ -1,8 +1,8 @@
 import random
-import datetime
+from datetime import datetime, timedelta
 
-start_date = datetime.date(2021, 12, 1)
-end_date = datetime.date(2022, 1, 1)
+start_date = datetime.now().replace(day=1)
+end_date = start_date + timedelta(30)
 
 time_between_dates = end_date - start_date
 days_between_dates = time_between_dates.days
@@ -1900,10 +1900,10 @@ sample_events = {"events": list()}
 for i in range(108):
 
     random_number_of_days = random.randrange(days_between_dates)
-    random_date = start_date + datetime.timedelta(days=random_number_of_days)
+    random_date = start_date + timedelta(days=random_number_of_days)
 
-    event_day = datetime.datetime.strftime(random_date, "%Y-%m-%d")
-    event_status = "upcoming" if datetime.datetime.now().date() < random_date else random.choice(["in-progress", "done", "missed"])
+    event_day = datetime.strftime(random_date, "%Y-%m-%d")
+    event_status = "upcoming" if datetime.now() < random_date else random.choice(["in-progress", "done", "missed"])
 
     client = random.choice(sample_data['data'])
     sample_events["events"].append( {    

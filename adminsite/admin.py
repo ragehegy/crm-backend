@@ -40,6 +40,6 @@ class CustomModelAdmin(admin.ModelAdmin):
 for model in apps.get_models():
     try:
         if model._meta.app_label in APPS:
-            custom_admin.register(model)
+            custom_admin.register(model, CustomModelAdmin)
     except Exception:
         continue
