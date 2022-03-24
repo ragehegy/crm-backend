@@ -3,14 +3,14 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
 
-from .renderers import UserJSONRenderer
+from utils.renderers import JSONRenderer
 from .serializers import LineSerializer, ProductSerializer
 from .models import Line, Product
 
 
 class LinesView(APIView):
     permission_classes = (IsAuthenticated,)
-    renderer_classes = (UserJSONRenderer,)
+    renderer_classes = (JSONRenderer,)
     serializer_class = LineSerializer
 
     def get(self, request):
@@ -23,7 +23,7 @@ class LinesView(APIView):
 
 class ProductsView(APIView):
     permission_classes = (IsAuthenticated,)
-    renderer_classes = (UserJSONRenderer,)
+    renderer_classes = (JSONRenderer,)
     serializer_class = ProductSerializer
 
     def get(self, request):

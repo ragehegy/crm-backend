@@ -6,12 +6,12 @@ from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from django.contrib.auth import logout
 
 from .serializers import UserSerializer, LoginSerializer, LogoutSerializer
-from .renderers import UserJSONRenderer
+from utils.renderers import JSONRenderer
 
 
 class Registration(APIView):
     permission_classes = (AllowAny,)
-    renderer_classes = (UserJSONRenderer,)
+    renderer_classes = (JSONRenderer,)
     serializer_class = UserSerializer
 
     def post(self, request):
@@ -25,7 +25,7 @@ class Registration(APIView):
 
 class Login(APIView):
     permission_classes = (AllowAny,)
-    renderer_classes = (UserJSONRenderer,)
+    renderer_classes = (JSONRenderer,)
     serializer_class = LoginSerializer
 
     def post(self, request):
@@ -52,7 +52,7 @@ class Logout(APIView):
 
 class UserUpdateDelete(RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
-    renderer_classes = (UserJSONRenderer,)
+    renderer_classes = (JSONRenderer,)
     serializer_class = UserSerializer
 
     def retrieve(self, request, *args, **kwargs):

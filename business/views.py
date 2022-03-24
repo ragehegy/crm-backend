@@ -3,14 +3,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
 
-from .renderers import UserJSONRenderer
+from utils.renderers import JSONRenderer
 from .serializers import LeaveRequestQuerySerializer, LeaveRequestSerializer, RequestSerializer, RequestQuerySerializer
 from .models import Request, LeaveRequest
 
 
 class RequestsView(APIView):
     permission_classes = (IsAuthenticated,)
-    renderer_classes = (UserJSONRenderer,)
+    renderer_classes = (JSONRenderer,)
     serializer_class = RequestSerializer
 
     def get(self, request):
@@ -36,7 +36,7 @@ class RequestsView(APIView):
 
 class LeaveRequestsView(APIView):
     permission_classes = (IsAuthenticated,)
-    renderer_classes = (UserJSONRenderer,)
+    renderer_classes = (JSONRenderer,)
     serializer_class = LeaveRequestSerializer
 
     def get(self, request):
