@@ -38,7 +38,7 @@ class Employee(User):
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name="employees")
     
     def __str__(self) -> str:
-        return "{} {}".format(self.first_name, self.last_name)
+        return "{} {} - {}".format(self.first_name, self.last_name, self.type)
 
 
 class Unit(models.Model):

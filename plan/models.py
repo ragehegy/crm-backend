@@ -3,7 +3,6 @@ from uuid import uuid4
 from django.db import models
 from django.utils import timezone
 
-
 PLAN_STATUS = (
     ("NEW", "NEW"),
     ("APPROVED", "APPROVED"),
@@ -39,8 +38,11 @@ class Plan(models.Model):
 
 class SubPlan(models.Model):
 
-    id = models.OneToOneField(Plan, primary_key=True, on_delete=models.CASCADE)
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
     parent_plan = models.ForeignKey(Plan, on_delete=models.CASCADE, related_name='childs')
+
+    def __str__(self) -> str:
+        return "%s - %s" %(self.id.employee.name, self.id)
 
 
 class PlanRequest(models.Model):
@@ -58,12 +60,33 @@ class VisitAgenda(models.Model):
     )
 
     id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
-    status = models.CharField(max_length=255, blank=False, default='NEW', choices=PLAN_STATUS)
+    status = models.CharField("Visit History", max_length=255, blank=False, default='UPCOMING', choices=VISIT_STATUS)
+    approval_status = models.CharField("Visit Approval Status", max_length=255, blank=False, default='NEW', choices=PLAN_STATUS)
     type = models.CharField(max_length=255, blank=False, default='SINGLE', choices=VISIT_TYPES)
+    datetime = models.DateTimeField("Date & Time of Visit", editable=False, default=timezone.now)
+    notes = models.TextField(blank=True)
+    created = models.DateTimeField(editable=False, default=timezone.now)
+    updated_at = models.DateTimeField(editable=False, default=timezone.now)
 
     plan = models.ForeignKey(SubPlan, on_delete=models.CASCADE, related_name='visits')
     client = models.ForeignKey('business.BusinessClient', on_delete=models.CASCADE, related_name='visits')
 
+    def __str__(self) -> str:
+        return "%s - %s" %(self.plan, self.client.client.name)
+
+class VisitLog(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
+    status = models.CharField("Visit last entry's status", max_length=255, blank=False, default='UPCOMING', choices=VISIT_STATUS)
+    timestamp = models.DateTimeField(editable=False, default=timezone.now)
+    feedback = models.IntegerField(blank=False, default=0)
+
+    visit = models.ForeignKey(VisitAgenda, on_delete=models.CASCADE, related_name='logs')
+
+    class Meta:
+        ordering = ['-timestamp',]
+
+    def __str__(self) -> str:
+        return "%s - %s on %s" %(self.visit, self.status, self.timestamp)
 
 class DoubleVisit(models.Model):
     VISIT_TYPES = (
@@ -76,14 +99,6 @@ class DoubleVisit(models.Model):
     
     visit = models.OneToOneField(VisitAgenda, on_delete=models.CASCADE, related_name='coach')
     request = models.OneToOneField('business.Request', on_delete=models.CASCADE, related_name='visit')
-
-
-class VisitDetails(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
-    status = models.CharField(max_length=255, blank=False, default='UPCOMING', choices=VISIT_STATUS)
-    timestamp = models.DateTimeField(editable=False, default=timezone.now)
-    notes = models.TextField(blank=True)
-
 
 class VisitProduct(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, unique=True)

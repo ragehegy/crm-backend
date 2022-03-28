@@ -4,8 +4,8 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from utils.renderers import JSONRenderer
-from .serializers import LeaveRequestQuerySerializer, LeaveRequestSerializer, RequestSerializer, RequestQuerySerializer
-from .models import Request, LeaveRequest
+from .serializers import BusinessClientSerializer, LeaveRequestQuerySerializer, LeaveRequestSerializer, RequestSerializer, RequestQuerySerializer
+from .models import BusinessClient, Request, LeaveRequest
 
 
 class RequestsView(APIView):
@@ -56,5 +56,17 @@ class LeaveRequestsView(APIView):
         serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class BusinessClientsView(APIView):
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (JSONRenderer,)
+    serializer_class = BusinessClientSerializer
+
+    def get(self, request):        
+        qs = BusinessClient.objects.all()
+
+        serializer = self.serializer_class(qs, many=True)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)

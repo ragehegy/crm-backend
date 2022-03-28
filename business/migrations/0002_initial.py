@@ -15,16 +15,16 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='districtemployeeline',
-            name='line',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='districts', to='inventory.line'),
-        ),
-        migrations.AddField(
-            model_name='districtbrick',
-            name='district',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='bricks', to='business.businessdistrict'),
-        ),
+        # # migrations.AddField(
+        # #     model_name='districtemployeeline',
+        # #     name='line',
+        # #     field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='districts', to='inventory.line'),
+        # # ),
+        # migrations.AddField(
+        #     model_name='districtbrick',
+        #     name='district',
+        #     field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='bricks', to='business.businessdistrict'),
+        # ),
         migrations.AddField(
             model_name='businessdistrict',
             name='business',

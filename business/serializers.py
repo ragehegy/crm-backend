@@ -2,7 +2,9 @@ from uuid import uuid4
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 
-from .models import DistrictEmplyoee, LeaveRequest, Request, Unit
+from shared.serializers import ClientSerializer
+
+from .models import BusinessClient, DistrictEmplyoee, Employee, LeaveRequest, Request, Unit
 
 
 class DistrictEmployeesSerializer(serializers.Serializer):
@@ -39,6 +41,10 @@ class EmployeeSerializer(serializers.Serializer):
     email = serializers.CharField(max_length=255, required=False)
     username = serializers.CharField(max_length=255, required=False)
     phone = serializers.CharField(max_length=255, required=False)
+
+    class Meta:
+        model = Employee
+        fields = '__all__'
 
 
 class RequestQuerySerializer(serializers.Serializer):
@@ -94,3 +100,11 @@ class LeaveRequestSerializer(serializers.Serializer):
         leave_request.save()
         
         return leave_request
+
+class BusinessClientSerializer(serializers.Serializer):
+    id = serializers.UUIDField(required=False)
+    details = ClientSerializer(source='client', required=False)
+
+    class Meta:
+        model = BusinessClient
+        fields = '__all__'
