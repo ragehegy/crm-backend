@@ -34,7 +34,13 @@ class VisitProductSerializer(serializers.Serializer):
     class Meta:
         model = VisitProduct
         fields = '__all__'
-        
+
+class VisitQuerySerializer(serializers.Serializer):
+    id = serializers.UUIDField(required=False)
+    status = serializers.CharField(required=False)
+    from_time = serializers.DateTimeField(required=False)
+    to_time = serializers.DateTimeField(required=False)
+
 class VisitSerializer(serializers.Serializer):
     id = serializers.UUIDField(required=False, default=uuid4)
     plan_id = serializers.UUIDField(required=True, write_only=True)

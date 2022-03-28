@@ -51,6 +51,8 @@ class Client(models.Model):
     address = models.CharField(blank=False, max_length=255)
     email = models.EmailField(db_index=True, unique=True)    
     phone = models.CharField(max_length=255, blank=False)
+    type = models.CharField(max_length=5, blank=False, default='AM')
+    client_class = models.CharField(max_length=5, blank=False, default='B')
 
     def __str__(self) -> str:
         return self.name.title()

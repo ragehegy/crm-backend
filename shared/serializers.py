@@ -9,6 +9,8 @@ class ClientSerializer(serializers.Serializer):
     address = serializers.CharField(required=False)
     email = serializers.CharField(required=False)
     phone = serializers.CharField(required=False)
+    type = serializers.CharField(required=False)
+    client_class = serializers.CharField(required=False)
 
     class Meta:
         model = Client
