@@ -39,10 +39,14 @@ class Plan(models.Model):
 class SubPlan(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
+    name = models.CharField("Subplan title", blank=False, max_length=255, default='New subplan')
+    start_date = models.DateField(blank=False, default=timezone.now)
+    end_date = models.DateField(blank=False, default=timezone.now)
+
     parent_plan = models.ForeignKey(Plan, on_delete=models.CASCADE, related_name='childs')
 
     def __str__(self) -> str:
-        return "%s - %s" %(self.id.employee.name, self.id)
+        return "%s - %s" %(self.name, self.id)
 
 
 class PlanRequest(models.Model):

@@ -40,6 +40,18 @@ class VisitQuerySerializer(serializers.Serializer):
     status = serializers.CharField(required=False)
     from_time = serializers.DateTimeField(required=False)
     to_time = serializers.DateTimeField(required=False)
+    datetime__range = serializers.ListField(child=serializers.DateTimeField(), required=False)
+    employee_id = serializers.UUIDField(required=False)
+
+    def to_representation(self, instance):
+        instance.update({
+            'datetime__range': [instance.pop('from_time'), instance.pop('to_time')]
+        })
+
+        # instance.update({
+        #     'plan__parent_plan__employee__id': instance.pop('employee_id')
+        # })
+        return super(VisitQuerySerializer, self).to_representation(instance)
 
 class VisitSerializer(serializers.Serializer):
     id = serializers.UUIDField(required=False, default=uuid4)
@@ -66,6 +78,9 @@ class VisitSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
+        visit = VisitAgenda.objects.filter(client__id=validated_data['client_id'], datetime=validated_data['datetime']).first()
+        if visit:
+            return visit
         visit = VisitAgenda.objects.create(**validated_data)
         visit.save()
         return visit

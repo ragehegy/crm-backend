@@ -23,8 +23,9 @@ class PlanView(viewsets.ModelViewSet):
         
     def create(self, request):
         data = request.data
+        is_many = isinstance(data, list)
 
-        serializer = VisitSerializer(data=data)
+        serializer = VisitSerializer(data=data, many=is_many)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -35,17 +36,22 @@ class VisitView(viewsets.ModelViewSet):
     renderer_classes = (JSONRenderer,)
     serializer_class = VisitSerializer
 
+    def get_queryset(self):
+        data = VisitAgenda.objects.filter(plan__parent_plan__employee=self.request.user)
+        return data
+
     def list(self, request, *args, **kwargs):
         serializer = VisitQuerySerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
 
-        qs = VisitAgenda.objects.filter(**serializer.data)
+        qs = self.get_queryset()
+        qs = qs.filter(**serializer.data)
         serializer = self.serializer_class(qs, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)  
 
     def retrieve(self, request, pk=None, *args, **kwargs):
-        qs = VisitAgenda.objects.filter(id=pk).first()
+        qs = self.get_queryset().filter(id=pk).first()
         serializer = VisitSerializer(qs)
 
         return Response(serializer.data, status=status.HTTP_200_OK)  
