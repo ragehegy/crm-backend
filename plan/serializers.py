@@ -55,7 +55,7 @@ class VisitQuerySerializer(serializers.Serializer):
 
 class VisitSerializer(serializers.Serializer):
     id = serializers.UUIDField(required=False, default=uuid4)
-    plan_id = serializers.UUIDField(required=True, write_only=True)
+    plan_id = serializers.UUIDField(required=True)
     client_id = serializers.UUIDField(required=True, write_only=True)
     status = serializers.CharField(required=False)
     approval_status = serializers.CharField(required=False)
@@ -88,7 +88,7 @@ class VisitSerializer(serializers.Serializer):
 class SubPlanSerializer(serializers.Serializer):
     id = serializers.UUIDField(required=False, default=uuid4)
     parent_plan_id = serializers.UUIDField()
-    visits = VisitSerializer(many=True, read_only=True)
+    # visits = VisitSerializer(many=True, read_only=True)
 
     class Meta:
         model = SubPlan

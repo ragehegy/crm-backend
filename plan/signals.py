@@ -7,7 +7,6 @@ from .models import VisitAgenda, VisitLog
 def create_log(sender, instance, **kwargs):
     if kwargs['created'] == True:
         log = VisitLog.objects.create(status="UPCOMING", visit=instance)
-        print("log")
         log.save()
 
 @receiver(signals.post_save, sender=VisitLog, dispatch_uid="update_visit_status")

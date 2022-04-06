@@ -43,6 +43,7 @@ class SubPlan(models.Model):
     start_date = models.DateField(blank=False, default=timezone.now)
     end_date = models.DateField(blank=False, default=timezone.now)
 
+    employee = models.ForeignKey('business.Employee', on_delete=models.CASCADE, related_name='subplans')
     parent_plan = models.ForeignKey(Plan, on_delete=models.CASCADE, related_name='childs')
 
     def __str__(self) -> str:

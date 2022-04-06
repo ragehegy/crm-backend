@@ -1,13 +1,12 @@
-from django.shortcuts import render
-
+from datetime import datetime
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
 
 from utils.renderers import JSONRenderer
-from .models import Plan, VisitAgenda
-from .serializers import PlanSerializer, VisitQuerySerializer, VisitSerializer
+from .models import Plan, SubPlan, VisitAgenda
+from .serializers import PlanSerializer, SubPlanSerializer, VisitQuerySerializer, VisitSerializer
 
 class PlanView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
@@ -15,7 +14,7 @@ class PlanView(viewsets.ModelViewSet):
     serializer_class = PlanSerializer
 
     def list(self, request):
-        qs = Plan.objects.filter(has_parent=False)
+        qs = Plan.objects.filter(has_parent=False, employee=self.request.user)
 
         serializer = self.serializer_class(qs, many=True)
 
@@ -29,7 +28,13 @@ class PlanView(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)      
+        return Response(serializer.data, status=status.HTTP_201_CREATED)   
+        
+    def retrieve(self, request, *args, **kwargs):
+        qs = SubPlan.objects.filter(start_date__month=datetime.now().month+1).first()
+        serializer = SubPlanSerializer(qs)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)  
 
 class VisitView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
@@ -37,9 +42,19 @@ class VisitView(viewsets.ModelViewSet):
     serializer_class = VisitSerializer
 
     def get_queryset(self):
-        data = VisitAgenda.objects.filter(plan__parent_plan__employee=self.request.user)
+        data = VisitAgenda.objects.filter(plan__employee=self.request.user)
         return data
 
+    def create(self, request):
+        data = request.data
+        is_many = isinstance(data, list)
+
+        serializer = VisitSerializer(data=data, many=is_many)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)      
+        
     def list(self, request, *args, **kwargs):
         serializer = VisitQuerySerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
@@ -56,12 +71,9 @@ class VisitView(viewsets.ModelViewSet):
 
         return Response(serializer.data, status=status.HTTP_200_OK)  
 
-    def create(self, request):
-        data = request.data
+    def destroy(self, request, pk=None, *args, **kwargs):
+        qs = self.get_queryset().filter(id=pk).first()
+        self.perform_destroy(qs)
 
-        serializer = self.serializer_class(data=data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED)   
+        return Response(status=status.HTTP_204_NO_CONTENT)  
         
