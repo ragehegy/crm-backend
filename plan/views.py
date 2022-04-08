@@ -71,6 +71,9 @@ class VisitView(viewsets.ModelViewSet):
 
         return Response(serializer.data, status=status.HTTP_200_OK)  
 
+    def partial_update(self, request, pk, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
     def destroy(self, request, pk=None, *args, **kwargs):
         qs = self.get_queryset().filter(id=pk).first()
         self.perform_destroy(qs)

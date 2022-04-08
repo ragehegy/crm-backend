@@ -85,6 +85,15 @@ class VisitSerializer(serializers.Serializer):
         visit.save()
         return visit
 
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            try:
+                setattr(instance, attr, value)
+            except:
+                pass
+        instance.save()
+        return instance
+
 class SubPlanSerializer(serializers.Serializer):
     id = serializers.UUIDField(required=False, default=uuid4)
     parent_plan_id = serializers.UUIDField()
