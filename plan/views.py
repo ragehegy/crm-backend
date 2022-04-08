@@ -42,7 +42,7 @@ class VisitView(viewsets.ModelViewSet):
     serializer_class = VisitSerializer
 
     def get_queryset(self):
-        data = VisitAgenda.objects.filter(plan__employee=self.request.user)
+        data = VisitAgenda.objects.filter(plan__employee__id=self.request.user.id)
         return data
 
     def create(self, request):
