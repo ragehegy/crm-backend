@@ -72,9 +72,9 @@ class VisitSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['status'] = data.get('status', None).lower()
-        data['approval_status'] = data.get('approval_status', None).lower()
-        data['type'] = data.get('type', None).lower()
+        data['status'] = data.get('status', None).upper()
+        data['approval_status'] = data.get('approval_status', None).upper()
+        data['type'] = data.get('type', None).upper()
         return data
 
     def create(self, validated_data):
