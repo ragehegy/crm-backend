@@ -13,6 +13,7 @@ PLAN_STATUS = (
 )
 
 VISIT_STATUS = (
+    ("CREATED", "CREATED"),
     ("UPCOMING", "UPCOMING"),
     ("IN_PROGRESS", "IN_PROGRESS"),
     ("CLOSED", "CLOSED"),
