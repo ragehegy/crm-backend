@@ -26,10 +26,10 @@ class VisitLogSerializer(serializers.Serializer):
         return log
 
 class VisitProductSerializer(serializers.Serializer):
-    # id = serializers.UUIDField(required=False, default=uuid4)
-    product_details = ProductSerializer(source='product')
-    feedback = serializers.CharField(required=False)
-    notes = serializers.CharField(required=False)
+    id = serializers.UUIDField(required=False, default=uuid4, write_only=True)
+    details = ProductSerializer(source='product', required=False)
+    feedback = serializers.CharField(required=False, default=0)
+    notes = serializers.CharField(required=False, default='')
 
     class Meta:
         model = VisitProduct
@@ -53,47 +53,6 @@ class VisitQuerySerializer(serializers.Serializer):
         # })
         return super(VisitQuerySerializer, self).to_representation(instance)
 
-class VisitSerializer(serializers.Serializer):
-    id = serializers.UUIDField(required=False, default=uuid4)
-    plan_id = serializers.UUIDField(required=True)
-    client_id = serializers.UUIDField(required=True, write_only=True)
-    status = serializers.CharField(required=False)
-    approval_status = serializers.CharField(required=False)
-    type = serializers.ChoiceField(required=True, choices=VisitAgenda.VISIT_TYPES)
-    datetime = serializers.DateTimeField(required=False)
-    notes = serializers.CharField(required=False)
-    client = BusinessClientSerializer(read_only=True)
-    products = VisitProductSerializer(many=True, required=False, read_only=True)
-    logs = VisitLogSerializer(many=True, required=False)
-
-    class Meta:
-        model = VisitAgenda
-        fields = "__all__"
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data['status'] = data.get('status', None).upper()
-        data['approval_status'] = data.get('approval_status', None).upper()
-        data['type'] = data.get('type', None).upper()
-        return data
-
-    def create(self, validated_data):
-        visit = VisitAgenda.objects.filter(client__id=validated_data['client_id'], datetime=validated_data['datetime']).first()
-        if visit:
-            return visit
-        visit = VisitAgenda.objects.create(**validated_data)
-        visit.save()
-        return visit
-
-    def update(self, instance, validated_data):
-        for attr, value in validated_data.items():
-            try:
-                setattr(instance, attr, value)
-            except:
-                pass
-        instance.save()
-        return instance
-
 class SubPlanSerializer(serializers.Serializer):
     id = serializers.UUIDField(required=False, default=uuid4)
     parent_plan_id = serializers.UUIDField()
@@ -102,6 +61,68 @@ class SubPlanSerializer(serializers.Serializer):
     class Meta:
         model = SubPlan
         fields = "__all__"
+
+class VisitSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(required=False, default=uuid4)
+    client_id = serializers.UUIDField(required=True, write_only=True)
+    plan_id = serializers.UUIDField(required=True, write_only=True)
+    plan = SubPlanSerializer(required=False)
+    status = serializers.CharField(required=False)
+    approval_status = serializers.CharField(required=False)
+    type = serializers.ChoiceField(required=True, choices=VisitAgenda.VISIT_TYPES)
+    datetime = serializers.DateTimeField(required=False)
+    notes = serializers.CharField(required=False)
+    client = BusinessClientSerializer(source='client.client', read_only=True)
+    products = VisitProductSerializer(many=True, required=False)
+    logs = VisitLogSerializer(many=True, required=False)
+
+    class Meta:
+        model = VisitAgenda
+        fields = "__all__"
+
+    def create(self, validated_data):
+        products = validated_data.pop('products', None)
+        visit = VisitAgenda.objects.create(**validated_data)
+        if products:
+            VisitProduct.objects.bulk_create(
+                [
+                    VisitProduct(
+                        visit=visit, 
+                        product_id=product['id'],
+                        feedback=product['feedback'],
+                        notes=product['notes'],
+                    )
+                    for product in products]
+            )
+        return visit
+
+    def update(self, instance, validated_data):
+        products = validated_data.pop('products', None)
+        if products:
+            old = VisitProduct.objects.filter(visit_id=instance.id)
+            old.delete()
+            VisitProduct.objects.bulk_create(
+                [
+                    VisitProduct(
+                        visit=instance, 
+                        product_id=product['id'],
+                        feedback=product.get('feedback', 0),
+                        notes=product.get('notes', ""),
+                    )
+                    for product in products
+                ]
+            )
+        for attr, value in validated_data.items(): 
+            setattr(instance, attr, value)
+        return instance
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['status'] = data.get('status', None).upper()
+        data['approval_status'] = data.get('approval_status', None).upper()
+        data['type'] = data.get('type', None).upper()
+        return data
+
 
 class PlanSerializer(serializers.Serializer):
     id = serializers.UUIDField(required=False, default=uuid4)
