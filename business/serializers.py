@@ -101,15 +101,15 @@ class LeaveRequestSerializer(serializers.Serializer):
         
         return leave_request
 
-class BusinessClientSerializer(serializers.Serializer):
+class BusinessClientSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(required=False)
-    name = serializers.CharField(required=False)
-    address = serializers.CharField(required=False)
-    email = serializers.CharField(max_length=255, required=False)
-    phone = serializers.CharField(max_length=255, required=False)
-    type = serializers.CharField(max_length=255, required=False)
-    client_class = serializers.CharField(max_length=255, required=False)
+    name = serializers.CharField(required=False, source='client.name')
+    address = serializers.CharField(required=False, source='client.address')
+    email = serializers.CharField(max_length=255, required=False, source='client.email')
+    phone = serializers.CharField(max_length=255, required=False, source='client.phone')
+    type = serializers.CharField(max_length=255, required=False, source='client.type')
+    client_class = serializers.CharField(max_length=255, required=False, source='client.client_class')
 
     class Meta:
         model = BusinessClient
-        fields = '__all__'
+        exclude = ('business', 'client')
