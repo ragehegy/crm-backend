@@ -48,40 +48,40 @@ class VisitQuerySerializer(serializers.Serializer):
             'datetime__range': [instance.pop('from_time'), instance.pop('to_time')]
         })
 
+        # TODO: Filter by request.user.id
         # instance.update({
         #     'plan__parent_plan__employee__id': instance.pop('employee_id')
         # })
         return super(VisitQuerySerializer, self).to_representation(instance)
 
-class SubPlanSerializer(serializers.Serializer):
+class SubPlanSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(required=False, default=uuid4)
-    parent_plan_id = serializers.UUIDField()
-    # visits = VisitSerializer(many=True, read_only=True)
 
     class Meta:
         model = SubPlan
-        fields = "__all__"
+        exclude = ('parent_plan', 'employee', )
 
 class VisitSerializer(serializers.ModelSerializer):
-    id = serializers.UUIDField(required=False, default=uuid4)
-    client_id = serializers.UUIDField(required=True, write_only=True)
-    plan_id = serializers.UUIDField(required=True, write_only=True)
     plan = SubPlanSerializer(required=False)
-    status = serializers.CharField(required=False)
-    approval_status = serializers.CharField(required=False)
-    type = serializers.ChoiceField(required=True, choices=VisitAgenda.VISIT_TYPES)
-    datetime = serializers.DateTimeField(required=False)
-    notes = serializers.CharField(required=False)
-    client = BusinessClientSerializer(source='client.client', read_only=True)
+    client = BusinessClientSerializer(required=False)
     products = VisitProductSerializer(many=True, required=False)
     logs = VisitLogSerializer(many=True, required=False)
 
     class Meta:
         model = VisitAgenda
         fields = "__all__"
-
+    
     def create(self, validated_data):
         products = validated_data.pop('products', None)
+        plan = validated_data.pop('plan', None)
+        client = validated_data.pop('client', None)
+
+        if not plan or not client:
+            raise serializers.ValidationError('Plan and Client fields are required.')
+
+        validated_data['plan_id'] = plan['id']
+        validated_data['client_id'] = client['id']
+
         visit = VisitAgenda.objects.create(**validated_data)
         if products:
             VisitProduct.objects.bulk_create(
@@ -122,7 +122,6 @@ class VisitSerializer(serializers.ModelSerializer):
         data['approval_status'] = data.get('approval_status', None).upper()
         data['type'] = data.get('type', None).upper()
         return data
-
 
 class PlanSerializer(serializers.Serializer):
     id = serializers.UUIDField(required=False, default=uuid4)

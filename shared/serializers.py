@@ -5,6 +5,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from .models import *
 
 class ClientSerializer(serializers.Serializer):
+    id = serializers.UUIDField(required=False)
     name = serializers.CharField(required=False)
     address = serializers.CharField(required=False)
     email = serializers.CharField(required=False)
