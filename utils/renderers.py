@@ -10,7 +10,10 @@ class JSONRenderer(JSONRenderer):
         response = ''
 
         if 'ErrorDetail' in str(data):
-            response = json.dumps({'errors': data})
+            response = json.dumps(data)
         else:
-            response = json.dumps({'data': data})
+            response = json.dumps({
+                'status_code': renderer_context['response'].status_code,
+                'data': data,
+            })
         return response
