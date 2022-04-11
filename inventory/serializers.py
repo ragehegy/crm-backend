@@ -5,7 +5,7 @@ from .models import Line, Product
 class ProductSerializer(serializers.Serializer):
     id = serializers.UUIDField(required=False)
     line_id = serializers.UUIDField(required=False)
-    name = serializers.CharField(required=False)
+    name = serializers.CharField(required=False, allow_blank=True)
     category = serializers.CharField(required=False, allow_blank=True)
     description = serializers.CharField(required=False, allow_blank=True)
     quantity = serializers.CharField(required=False, allow_blank=True)
