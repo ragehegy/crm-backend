@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
             name='VisitDetails',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False, unique=True)),
-                ('status', models.CharField(choices=[('UPCOMING', 'UPCOMING'), ('IN_PROGRESS', 'IN_PROGRESS'), ('CLOSED', 'CLOSED'), ('MISSED', 'MISSED')], default='UPCOMING', max_length=255)),
+                ('status', models.CharField(choices=[('UPCOMING', 'UPCOMING'), ('IN-PROGRESS', 'IN-PROGRESS'), ('CLOSED', 'CLOSED'), ('MISSED', 'MISSED')], default='UPCOMING', max_length=255)),
                 ('timestamp', models.DateTimeField(default=django.utils.timezone.now, editable=False)),
                 ('notes', models.TextField(blank=True)),
             ],

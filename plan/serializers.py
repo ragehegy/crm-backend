@@ -62,6 +62,7 @@ class SubPlanSerializer(serializers.ModelSerializer):
         exclude = ('parent_plan', 'employee', )
 
 class VisitSerializer(serializers.ModelSerializer):
+    datetime = serializers.DateTimeField(required=False)
     plan = SubPlanSerializer(required=False)
     client = BusinessClientSerializer(required=False)
     products = VisitProductSerializer(many=True, required=False)
@@ -88,7 +89,7 @@ class VisitSerializer(serializers.ModelSerializer):
                 [
                     VisitProduct(
                         visit=visit, 
-                        product_id=product['id'],
+                        product_id=product['product']['id'],
                         feedback=product['feedback'],
                         notes=product['notes'],
                     )
@@ -98,6 +99,16 @@ class VisitSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         products = validated_data.pop('products', None)
+        plan = validated_data.pop('plan', None)
+        client = validated_data.pop('client', None)
+        logs = validated_data.pop('logs', None)
+
+        instance.__dict__.update(**validated_data)
+        instance.save()
+
+        validated_data['plan_id'] = plan['id']
+        validated_data['client_id'] = client['id']
+
         if products:
             old = VisitProduct.objects.filter(visit_id=instance.id)
             old.delete()
@@ -105,15 +116,14 @@ class VisitSerializer(serializers.ModelSerializer):
                 [
                     VisitProduct(
                         visit=instance, 
-                        product_id=product['id'],
+                        product_id=product['product']['id'],
                         feedback=product.get('feedback', 0),
                         notes=product.get('notes', ""),
                     )
                     for product in products
                 ]
             )
-        for attr, value in validated_data.items(): 
-            setattr(instance, attr, value)
+
         return instance
 
     def to_representation(self, instance):

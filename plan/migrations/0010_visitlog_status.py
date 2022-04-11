@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='visitlog',
             name='status',
-            field=models.CharField(choices=[('UPCOMING', 'UPCOMING'), ('IN_PROGRESS', 'IN_PROGRESS'), ('CLOSED', 'CLOSED'), ('MISSED', 'MISSED')], default='UPCOMING', max_length=255, verbose_name="Visit last entry's status"),
+            field=models.CharField(choices=[('UPCOMING', 'UPCOMING'), ('IN-PROGRESS', 'IN-PROGRESS'), ('CLOSED', 'CLOSED'), ('MISSED', 'MISSED')], default='UPCOMING', max_length=255, verbose_name="Visit last entry's status"),
         ),
     ]

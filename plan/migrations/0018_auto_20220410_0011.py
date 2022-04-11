@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='visitlog',
             name='status',
-            field=models.CharField(choices=[('CREATED', 'CREATED'), ('UPCOMING', 'UPCOMING'), ('IN_PROGRESS', 'IN_PROGRESS'), ('CLOSED', 'CLOSED'), ('MISSED', 'MISSED')], default='UPCOMING', max_length=255, verbose_name='Visit last entry status'),
+            field=models.CharField(choices=[('CREATED', 'CREATED'), ('UPCOMING', 'UPCOMING'), ('IN-PROGRESS', 'IN-PROGRESS'), ('CLOSED', 'CLOSED'), ('MISSED', 'MISSED')], default='UPCOMING', max_length=255, verbose_name='Visit last entry status'),
         ),
     ]

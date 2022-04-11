@@ -104,9 +104,9 @@ class LeaveRequestSerializer(serializers.Serializer):
 class BusinessClientSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(required=False)
     name = serializers.CharField(required=False, source='client.name')
-    address = serializers.CharField(required=False, source='client.address')
-    email = serializers.CharField(max_length=255, required=False, source='client.email')
-    phone = serializers.CharField(max_length=255, required=False, source='client.phone')
+    address = serializers.CharField(required=False, allow_blank=True, source='client.address')
+    email = serializers.CharField(max_length=255, required=False, allow_blank=True, source='client.email')
+    phone = serializers.CharField(max_length=255, required=False, allow_blank=True, source='client.phone')
     type = serializers.CharField(max_length=255, required=False, source='client.type')
     client_class = serializers.CharField(max_length=255, required=False, source='client.client_class')
 
