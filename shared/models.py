@@ -54,6 +54,8 @@ class Client(models.Model):
     type = models.CharField(max_length=5, blank=False, default='AM')
     client_class = models.CharField(max_length=5, blank=False, default='B')
 
+    city = models.ForeignKey(City, null=True, on_delete=models.SET_NULL, related_name='clients')
+
     def __str__(self) -> str:
         return self.name.title()
 
