@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.db.models import Count, F
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
@@ -6,7 +7,7 @@ from rest_framework.response import Response
 
 from utils.renderers import JSONRenderer
 from .models import Plan, SubPlan, VisitAgenda
-from .serializers import PlanSerializer, SubPlanSerializer, VisitQuerySerializer, VisitSerializer
+from .serializers import AggregateSerializer, PlanSerializer, SubPlanSerializer, VisitQuerySerializer, VisitSerializer
 
 class PlanView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
@@ -80,3 +81,15 @@ class VisitView(viewsets.ModelViewSet):
 
         return Response(status=status.HTTP_204_NO_CONTENT)  
         
+class PlanAggregatesView(viewsets.GenericViewSet):
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (JSONRenderer,)
+    serializer_class = AggregateSerializer
+    
+    def retrieve(self, request, *args, **kwargs):
+        params = request.query_params
+        qs = VisitAgenda.objects.order_by(params['field']).values(params['field']).annotate(value=F(params['field']), count=Count(params['field'])).filter(count__gt=0).all().values('value', 'count')
+
+        serializer = self.serializer_class(qs, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)  

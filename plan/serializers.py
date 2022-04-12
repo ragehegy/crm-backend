@@ -146,3 +146,9 @@ class PlanSerializer(serializers.Serializer):
     class Meta:
         model = Plan
         fields = "__all__"
+
+class AggregateSerializer(serializers.Serializer):
+    value = serializers.CharField(required=True)
+    count = serializers.FloatField()
+
+    
