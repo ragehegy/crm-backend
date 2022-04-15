@@ -40,6 +40,9 @@ class Employee(User):
     def __str__(self) -> str:
         return "{} {} - {}".format(self.first_name, self.last_name, self.type)
 
+    @property
+    def visits(self):
+        return self.subplans.first().visits
 
 class Unit(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, unique=True)

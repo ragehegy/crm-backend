@@ -50,6 +50,8 @@ class SubPlan(models.Model):
     def __str__(self) -> str:
         return '%s - %s' %(self.name, self.id)
 
+    def plan_clients(self):
+        return [visit.client for visit in self.visits.all()]
 
 class PlanRequest(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, unique=True)

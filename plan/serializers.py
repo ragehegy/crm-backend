@@ -1,6 +1,7 @@
 from uuid import uuid4
 from rest_framework import serializers
 
+from business.models import Employee
 from .models import *
 from business.serializers import BusinessClientSerializer, EmployeeSerializer
 from inventory.serializers import ProductSerializer
@@ -151,4 +152,35 @@ class AggregateSerializer(serializers.Serializer):
     value = serializers.CharField(required=True)
     count = serializers.FloatField()
 
-    
+class SubPlanSummarySerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(required=False)
+    employee = EmployeeSerializer()
+    total_visits = serializers.IntegerField(read_only=True, source='visits.count')
+    clients = BusinessClientSerializer(many=True, source='plan_clients')
+
+    class Meta:
+        model = SubPlan
+        exclude = ('parent_plan', )
+
+class EmployeeVisitsSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(required=False)
+    first_name = serializers.CharField(required=False)
+    last_name = serializers.CharField(required=False)
+    email = serializers.CharField(required=False)
+    username = serializers.CharField(required=False)
+    phone = serializers.CharField(required=False)
+    visits_total = serializers.IntegerField(source='visits.count')
+    visits_details = VisitSerializer(many=True, source='visits.all')
+
+    class Meta:
+        model = Employee
+        fields = (
+            'id',
+            'first_name',
+            'last_name',
+            'email',
+            'username',
+            'phone',
+            'visits_total',
+            'visits_details',
+        )

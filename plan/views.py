@@ -1,13 +1,14 @@
 from datetime import datetime
-from django.db.models import Count, F
+from django.db.models import Count, F, functions
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
 
 from utils.renderers import JSONRenderer
+from business.models import *
 from .models import Plan, SubPlan, VisitAgenda
-from .serializers import AggregateSerializer, PlanSerializer, SubPlanSerializer, VisitQuerySerializer, VisitSerializer
+from .serializers import AggregateSerializer, EmployeeVisitsSerializer, PlanSerializer, SubPlanSerializer, SubPlanSummarySerializer, VisitQuerySerializer, VisitSerializer
 
 class PlanView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
@@ -37,6 +38,22 @@ class PlanView(viewsets.ModelViewSet):
 
         return Response(serializer.data, status=status.HTTP_200_OK)  
 
+class SubPlanView(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (JSONRenderer,)
+    serializer_class = SubPlanSummarySerializer
+
+    def get_queryset(self):
+        data = SubPlan.objects.filter(employee__id=self.request.user.id)
+        return data
+
+    def list(self, request):
+        qs = SubPlan.objects.filter(employee=self.request.user)
+
+        serializer = self.serializer_class(qs, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
 class VisitView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     renderer_classes = (JSONRenderer,)
@@ -88,8 +105,33 @@ class PlanAggregatesView(viewsets.GenericViewSet):
     
     def retrieve(self, request, *args, **kwargs):
         params = request.query_params
-        qs = VisitAgenda.objects.order_by(params['field']).values(params['field']).annotate(value=F(params['field']), count=Count(params['field'])).filter(count__gt=0).all().values('value', 'count')
+        qs = VisitAgenda.objects.order_by(params['field']).\
+            values(params['field']).\
+                annotate(
+                    value=F(params['field']), 
+                    count=Count(params['field'])
+                ).\
+                filter(count__gt=0).all().\
+                    values('value', 'count')
 
         serializer = self.serializer_class(qs, many=True)
 
+        return Response(serializer.data, status=status.HTTP_200_OK)  
+
+    def list_by_date(self, request):
+        qs = VisitAgenda.objects.order_by('datetime').\
+            values('datetime').\
+                annotate(
+                    value=functions.TruncDate('datetime'), 
+                    count=Count('datetime')
+                ).filter(count__gt=0).all().\
+                    values('value', 'count')
+
+        serializer = self.serializer_class(qs, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)  
+
+    def list_employees(self, request):
+        qs = Employee.objects.filter(id=request.user.id)
+        serializer = EmployeeVisitsSerializer(qs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)  
