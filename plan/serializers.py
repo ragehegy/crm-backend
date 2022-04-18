@@ -1,4 +1,6 @@
 from uuid import uuid4
+
+from django.db import models
 from rest_framework import serializers
 
 from business.models import Employee
@@ -160,18 +162,52 @@ class SubPlanSummarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SubPlan
-        exclude = ('parent_plan', )
 
-class EmployeeVisitsSerializer(serializers.ModelSerializer):
+class EmployeeVisitsSerializer(serializers.Serializer):
     id = serializers.UUIDField(required=False)
     first_name = serializers.CharField(required=False)
     last_name = serializers.CharField(required=False)
     email = serializers.CharField(required=False)
     username = serializers.CharField(required=False)
     phone = serializers.CharField(required=False)
-    visits_total = serializers.IntegerField(source='visits.count')
     visits_details = VisitSerializer(many=True, source='visits.all')
 
+    visits_total = serializers.IntegerField(source='visits.count')
+    visits_coverage = serializers.SerializerMethodField()
+    visits_rate = serializers.SerializerMethodField()
+    working_days = serializers.IntegerField(source='visits.count')
+    top_product = serializers.SerializerMethodField()
+    top_client = serializers.SerializerMethodField()
+    top_tier = serializers.SerializerMethodField()
+    avg_feedback = serializers.SerializerMethodField()
+
+    def get_avg_feedback(self, obj):
+        return obj.visits.aggregate(models.Avg('logs__feedback')).get('logs__feedback__avg', 0)
+
+    def get_visits_coverage(self, obj):
+        return obj.visits.filter(logs__status='CLOSED').count()
+
+    def get_visits_rate(self, obj):
+        return self.get_visits_coverage(obj)/obj.visits.count()
+
+    def get_top__field(self, obj, field):
+        return obj.visits.\
+            values(field).\
+                annotate(
+                    value=models.F(field),
+                    count=models.Count(field)
+                ).\
+                filter(count__gt=0).all().\
+                    values('value', 'count').order_by('-count').first()
+
+    def get_top_product(self, obj):
+        return self.get_top__field(obj, 'products__product__name')
+
+    def get_top_client(self, obj):
+        return self.get_top__field(obj, 'client__client__type')
+
+    def get_top_tier(self, obj):
+        return self.get_top__field(obj, 'client__client__client_class')
     class Meta:
         model = Employee
         fields = (
@@ -181,6 +217,13 @@ class EmployeeVisitsSerializer(serializers.ModelSerializer):
             'email',
             'username',
             'phone',
-            'visits_total',
             'visits_details',
+            'visits_total',
+            'visits_coverage',
+            'visits_rate',
+            'working_days',
+            'top_product',
+            'top_client',
+            'top_tier',
+            'avg_feedback',
         )
