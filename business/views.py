@@ -1,8 +1,11 @@
 from rest_framework.views import APIView
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
 
+from business.filters import BusinessClientFilter
 from utils.renderers import JSONRenderer
 from .serializers import BusinessClientSerializer, LeaveRequestQuerySerializer, LeaveRequestSerializer, RequestSerializer, RequestQuerySerializer
 from .models import BusinessClient, Request, LeaveRequest
@@ -59,14 +62,11 @@ class LeaveRequestsView(APIView):
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-class BusinessClientsView(APIView):
+class BusinessClientsView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     renderer_classes = (JSONRenderer,)
+    queryset = BusinessClient.objects.all()
     serializer_class = BusinessClientSerializer
-
-    def get(self, request):        
-        qs = BusinessClient.objects.all()
-
-        serializer = self.serializer_class(qs, many=True)
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = BusinessClientFilter
+    

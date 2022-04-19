@@ -4,7 +4,9 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
 
+from plan.filters import EmployeeFilter
 from utils.renderers import JSONRenderer
 from business.models import *
 from .models import Plan, SubPlan, VisitAgenda
@@ -58,10 +60,12 @@ class VisitView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     renderer_classes = (JSONRenderer,)
     serializer_class = VisitSerializer
+    queryset = VisitAgenda.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = EmployeeFilter
 
     def get_queryset(self):
-        data = VisitAgenda.objects.filter(plan__employee__id=self.request.user.id)
-        return data
+        return self.queryset.filter(plan__employee__id=self.request.user.id)
 
     def create(self, request):
         data = request.data
@@ -72,25 +76,6 @@ class VisitView(viewsets.ModelViewSet):
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)      
-        
-    def list(self, request, *args, **kwargs):
-        serializer = VisitQuerySerializer(data=request.query_params)
-        serializer.is_valid(raise_exception=True)
-
-        qs = self.get_queryset()
-        qs = qs.filter(**serializer.data)
-        serializer = self.serializer_class(qs, many=True)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)  
-
-    def retrieve(self, request, pk=None, *args, **kwargs):
-        qs = self.get_queryset().filter(id=pk).first()
-        serializer = VisitSerializer(qs)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)  
-
-    def partial_update(self, request, pk, *args, **kwargs):
-        return super().partial_update(request, *args, **kwargs)
 
     def destroy(self, request, pk=None, *args, **kwargs):
         qs = self.get_queryset().filter(id=pk).first()
@@ -102,16 +87,20 @@ class PlanAggregatesView(viewsets.GenericViewSet):
     permission_classes = (IsAuthenticated,)
     renderer_classes = (JSONRenderer,)
     serializer_class = AggregateSerializer
+    queryset = VisitAgenda.objects.all()
+
+    def get_queryset(self):
+        return self.queryset.filter(plan__employee__id=self.request.user.id)
     
     def retrieve(self, request, *args, **kwargs):
         params = request.query_params
-        qs = VisitAgenda.objects.order_by(params['field']).\
+        qs = self.get_queryset().order_by(params['field']).\
             values(params['field']).\
                 annotate(
                     value=F(params['field']), 
                     count=Count(params['field'])
                 ).\
-                filter(count__gt=0).all().\
+                filter(count__gt=0, plan__employee__id=self.request.user.id).all().\
                     values('value', 'count')
 
         serializer = self.serializer_class(qs, many=True)
@@ -119,12 +108,12 @@ class PlanAggregatesView(viewsets.GenericViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)  
 
     def list_by_date(self, request):
-        qs = VisitAgenda.objects.order_by('datetime').\
+        qs = self.get_queryset().order_by('datetime').\
             values('datetime').\
                 annotate(
                     value=functions.TruncDate('datetime'), 
                     count=Count('datetime')
-                ).filter(count__gt=0).all().\
+                ).filter(count__gt=0, plan__employee__id=self.request.user.id).all().\
                     values('value', 'count')
 
         serializer = self.serializer_class(qs, many=True)
