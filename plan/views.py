@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
-from plan.filters import EmployeeFilter
+from plan.filters import VisitAgendaFilter
 from utils.renderers import JSONRenderer
 from business.models import *
 from .models import Plan, SubPlan, VisitAgenda
@@ -62,7 +62,7 @@ class VisitView(viewsets.ModelViewSet):
     serializer_class = VisitSerializer
     queryset = VisitAgenda.objects.all()
     filter_backends = [DjangoFilterBackend]
-    filterset_class = EmployeeFilter
+    filterset_class = VisitAgendaFilter
 
     def get_queryset(self):
         return self.queryset.filter(plan__employee__id=self.request.user.id)
