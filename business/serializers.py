@@ -2,10 +2,39 @@ from uuid import uuid4
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 
-from shared.serializers import ClientSerializer
+from shared.serializers import ClientSerializer, CitySerializer
+from .models import BusinessClient, BusinessDistrict, DistrictBrick, DistrictEmplyoee, Employee, LeaveRequest, Request, Unit
 
-from .models import BusinessClient, DistrictEmplyoee, Employee, LeaveRequest, Request, Unit
+class BusinessDistrictSerializer(serializers.ModelSerializer):
+    city = CitySerializer()
 
+    class Meta:
+        model = BusinessDistrict
+        fields = (
+            'id',
+            'name',
+            'city'
+        )
+
+class DistrictBrickSerializer(serializers.ModelSerializer):
+    district = BusinessDistrictSerializer()
+
+    class Meta:
+        model = DistrictBrick
+        fields = '__all__'
+
+class BusinessDistrictsSerializer(serializers.ModelSerializer):
+    city = CitySerializer()
+    bricks = DistrictBrickSerializer(many=True)
+
+    class Meta:
+        model = BusinessDistrict
+        fields = (
+            'id',
+            'name',
+            'city',
+            'bricks'
+        )
 
 class DistrictEmployeesSerializer(serializers.Serializer):
     district = serializers.UUIDField(required=True)

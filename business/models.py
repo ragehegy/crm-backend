@@ -1,4 +1,6 @@
 from uuid import uuid4
+import datetime
+import calendar
 
 from django.db import models
 from django.utils import timezone
@@ -41,8 +43,27 @@ class Employee(User):
         return "{} {} - {}".format(self.first_name, self.last_name, self.type)
 
     @property
+    def city(self):
+        return self.district.first().district.city.en_name
+
+    @property
     def visits(self):
         return self.subplans.first().visits
+
+    @property
+    def month_working_days(self, month=datetime.datetime.now()):
+        cal = calendar.Calendar()
+        requests = self.requests.filter(
+                                        status="APPROVED", 
+                                        type="LEAVE", 
+                                        leave__leave_type__in=["CASUAL", "VACATION"]
+                                    )
+        leaves = 0
+        for leave in requests:
+            delta = leave.leave.start_date - leave.leave.end_date
+            leaves -= delta.days
+        return len([x for x in cal.itermonthdays2(month.year, month.month) if x[0] !=0 and x[1] < 5]) - leaves
+    
 
 class Unit(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, unique=True)
@@ -150,6 +171,8 @@ class Request(models.Model):
 
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='requests')
 
+    def __str__(self) -> str:
+        return "(%s) %s - %s [%s]" %(self.status, self.employee.name, self.type, self.created, )
 
 class LeaveRequest(models.Model):
     LEAVE_TYPES = (

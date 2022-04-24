@@ -70,7 +70,7 @@ class ClientSpecialty(models.Model):
     specialty = models.ForeignKey(Specialty, on_delete=models.CASCADE, related_name='clients')
 
     def __str__(self) -> str:
-        return "%s (%s)" %(self.client.name, self.specialty.name)
+        return "%s (%s)" %(self.client.name, self.specialty.en_name)
 
     class Meta:
         verbose_name = 'Client Specialty'
