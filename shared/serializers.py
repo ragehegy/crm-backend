@@ -1,6 +1,4 @@
-from uuid import uuid4
 from rest_framework import serializers
-from rest_framework.exceptions import AuthenticationFailed
 
 from .models import *
 
@@ -15,4 +13,15 @@ class ClientSerializer(serializers.Serializer):
 
     class Meta:
         model = Client
+        fields = '__all__'
+
+class GovernorateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Governorate
+        fields = '__all__'
+
+class CitySerializer(serializers.ModelSerializer):
+    governorate = GovernorateSerializer()
+    class Meta:
+        model = City
         fields = '__all__'

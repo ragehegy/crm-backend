@@ -88,6 +88,8 @@ class PlanAggregatesView(viewsets.GenericViewSet):
     renderer_classes = (JSONRenderer,)
     serializer_class = AggregateSerializer
     queryset = VisitAgenda.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = VisitAgendaFilter
 
     def get_queryset(self):
         return self.queryset.filter(plan__employee__id=self.request.user.id)
@@ -102,8 +104,9 @@ class PlanAggregatesView(viewsets.GenericViewSet):
                 ).\
                 filter(count__gt=0, plan__employee__id=self.request.user.id).all().\
                     values('value', 'count')
-
-        serializer = self.serializer_class(qs, many=True)
+        
+        filtered = self.filterset_class(request.GET, queryset=qs)
+        serializer = self.serializer_class(filtered.qs, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)  
 
@@ -116,7 +119,8 @@ class PlanAggregatesView(viewsets.GenericViewSet):
                 ).filter(count__gt=0, plan__employee__id=self.request.user.id).all().\
                     values('value', 'count')
 
-        serializer = self.serializer_class(qs, many=True)
+        filtered = self.filterset_class(request.GET, queryset=qs)
+        serializer = self.serializer_class(filtered.qs, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)  
 

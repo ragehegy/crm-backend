@@ -7,8 +7,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from business.filters import BusinessClientFilter
 from utils.renderers import JSONRenderer
-from .serializers import BusinessClientSerializer, LeaveRequestQuerySerializer, LeaveRequestSerializer, RequestSerializer, RequestQuerySerializer
-from .models import BusinessClient, Request, LeaveRequest
+from .serializers import BusinessClientSerializer, BusinessDistrictSerializer, BusinessDistrictsSerializer, DistrictBrickSerializer, LeaveRequestQuerySerializer, LeaveRequestSerializer, RequestSerializer, RequestQuerySerializer
+from .models import BusinessClient, BusinessDistrict, DistrictBrick, Request, LeaveRequest
 
 
 class RequestsView(APIView):
@@ -70,3 +70,14 @@ class BusinessClientsView(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = BusinessClientFilter
     
+class BusinessDistrictsView(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (JSONRenderer,)
+    queryset = BusinessDistrict.objects.all()
+    serializer_class = BusinessDistrictSerializer
+
+class DistrictBricksView(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (JSONRenderer,)
+    queryset = DistrictBrick.objects.all()
+    serializer_class = DistrictBrickSerializer
