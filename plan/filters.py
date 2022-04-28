@@ -1,5 +1,6 @@
 import django_filters
 
+from business.models import Employee
 from .models import VisitAgenda
 
 class VisitAgendaFilter(django_filters.FilterSet):
@@ -35,7 +36,20 @@ class VisitAgendaFilter(django_filters.FilterSet):
             'plan__employee__district__district__city__id': ['in', ], # District
             'plan__employee__district__district__id': ['in', ], # Brick
 
-            'products__product__id': ['in'],
+            'products__product__id': ['in', 'exact'],
             'products__product__line__id': ['in'],
 
+        }
+
+
+class VisitEmployeeFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = Employee
+        fields = {
+            'id': ['exact', ],
+            'first_name': ['exact', 'in'],
+            'last_name': ['exact', 'in'],
+            'last_name': ['exact', 'in'],
+            'subplans__visits__datetime': ['range']
         }

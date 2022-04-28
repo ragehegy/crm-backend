@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
-from plan.filters import VisitAgendaFilter
+from .filters import VisitAgendaFilter, VisitEmployeeFilter
 from utils.renderers import JSONRenderer
 from business.models import *
 from .models import Plan, SubPlan, VisitAgenda
@@ -125,6 +125,13 @@ class PlanAggregatesView(viewsets.GenericViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)  
 
     def list_employees(self, request):
-        qs = Employee.objects.filter(id=request.user.id)
-        serializer = EmployeeVisitsSerializer(qs, many=True)
+        visits = self.filterset_class(request.GET, queryset=self.get_queryset())
+
+        qs = Employee.objects.filter(id=request.user.id, subplans__visits__in=visits.qs)
+        
+        filtered = VisitEmployeeFilter(request.GET, queryset=qs)
+        filtered.is_valid()
+
+        serializer = EmployeeVisitsSerializer(filtered.qs.distinct(), many=True)
+
         return Response(serializer.data, status=status.HTTP_200_OK)  

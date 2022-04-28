@@ -44,7 +44,9 @@ class Employee(User):
 
     @property
     def city(self):
-        return self.district.first().district.city.en_name
+        if self.district.first():
+            return self.district.first().district.city.en_name
+        return None
 
     @property
     def visits(self):
